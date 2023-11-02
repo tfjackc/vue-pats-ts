@@ -25,7 +25,7 @@ const routes = [
         component: () => import('@/views/ValuationPage.vue')
       },
       {
-        path: '/interactive_map/:account_id',
+        path: '/property_map/:account_id',
         name: 'PropertyMapPage',
         component: () => import('@/views/PropertyMapPage.vue')
       },

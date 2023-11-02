@@ -21,8 +21,8 @@
           <v-list-item prepend-icon="mdi-home-plus-outline" title="Development" value="development"></v-list-item>
           <v-list-item
             prepend-icon="mdi-map-marker-outline"
-            title="Interactive Map"
-            value="interactive_map"
+            title="Property Map"
+            value="property_map"
             router :to="{ name : 'PropertyMapPage' }"></v-list-item>
           <v-list-item
             prepend-icon="mdi-ruler-square-compass"

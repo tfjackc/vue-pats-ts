@@ -5,9 +5,7 @@ import { landGroup, taxlotLayer, pointGraphic, bufferGraphic } from '@/data/laye
 import Layer from "@arcgis/core/layers/Layer";
 import Collection from "@arcgis/core/core/Collection";
 
-
 let view: MapView;
-
 export const useMappingStore = defineStore('mapping_store', {
   state: () => ({
     popupData: []// Define your store state if needed
