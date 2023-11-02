@@ -1,28 +1,37 @@
 import ArcGISMap from '@arcgis/core/Map'
 import MapView from '@arcgis/core/views/MapView'
-import { landGroup, taxlotLayer, pointGraphic, bufferGraphic } from "./layers";
+import Home from "@arcgis/core/widgets/Home";
 
 const BASEMAP = 'topo-vector'
-
-
-export const map_app: any = {
-  //nearbyLayerView: null
-}
-
 export async function initialize(container: HTMLDivElement) {
 
   const map = new ArcGISMap({
-    basemap: BASEMAP,
-    layers: []
+    basemap: BASEMAP
+   // layers: [landGroup]
   })
 
   const view = new MapView({
     map,
     container,
-    center: [-118, 34],
-    zoom: 4
+    zoom: 12,
+    center: [ -120.8345, 44.2998 ],
+    popupEnabled: true,
+    popup: {
+      dockEnabled: true,
+      dockOptions: {
+        // dock popup at bottom-right side of view
+        buttonEnabled: false,
+        breakpoint: false,
+        position: "bottom-right"
+      }
+    }
   })
-  map_app.view = view
+
+  const homeWidget = new Home({
+    view: view
+  });
+
+  view.ui.add(homeWidget, "top-left");
 
   await view.when()
   return view.when()
