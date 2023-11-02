@@ -7,10 +7,12 @@ let view: MapView;
 
 export const useMappingStore = defineStore('mapping_store', {
   state: () => ({
-    // Define your store state if needed
+    popupData: []// Define your store state if needed
   }),
   getters: {
-    // Define your getters if needed
+    getProperty(state){
+      return state.popupData
+    }
   },
   actions: {
     async createMap(mapContainer: HTMLDivElement) {
@@ -48,17 +50,18 @@ export const useMappingStore = defineStore('mapping_store', {
         // Use the 'then' method to call 'displayResults' after the query is complete
       // Use the 'then' method to call 'displayResults' after the query is complete
       return createdLayer.queryFeatures(queryTaxlots).then((fset: any) => {
-        console.log("Query Result (fset):", fset);
-        console.log("Features in Query Result (fset.features):", fset.features);
+        this.popupData = fset.features
         this.displayResults(fset);
       });
     },
 
     async displayResults(fset: any) {
-      if (fset && fset.features && fset.features.length > 0) {
+      if (fset && fset.features) {
+        const data = fset.features
+        console.log(data.attributes)
         await view.openPopup({
           location: pointGraphic.geometry,
-          features: fset.features,
+          features: data,
           featureMenuOpen: true,
         });
 
