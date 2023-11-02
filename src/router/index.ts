@@ -26,18 +26,13 @@ const routes = [
       },
       {
         path: '/interactive_map/:account_id',
-        name: 'InteractiveMapPage',
-        component: () => import('@/views/InteractiveMapPage.vue')
+        name: 'PropertyMapPage',
+        component: () => import('@/views/PropertyMapPage.vue')
       },
       {
         path: '/surveys/:account_id',
         name: 'SurveyMapPage',
         component: () => import('@/views/SurveyMapPage.vue')
-      },
-      {
-        path: '/testmap/:account_id',
-        name: 'TestMap',
-        component: () => import('@/views/TestMap.vue')
       }
     ],
   },

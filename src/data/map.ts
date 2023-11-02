@@ -20,8 +20,8 @@ export async function initialize(container: HTMLDivElement) {
       dockEnabled: true,
       dockOptions: {
         // dock popup at bottom-right side of view
-        buttonEnabled: false,
-        breakpoint: false,
+        buttonEnabled: true,
+        breakpoint: true,
         position: "bottom-right"
       }
     }

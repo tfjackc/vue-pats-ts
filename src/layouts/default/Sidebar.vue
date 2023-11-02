@@ -23,17 +23,12 @@
             prepend-icon="mdi-map-marker-outline"
             title="Interactive Map"
             value="interactive_map"
-            router :to="{ name : 'InteractiveMapPage' }"></v-list-item>
+            router :to="{ name : 'PropertyMapPage' }"></v-list-item>
           <v-list-item
             prepend-icon="mdi-ruler-square-compass"
             title="Surveys"
             value="surveys"
             router :to="{ name : 'SurveyMapPage' }"></v-list-item>
-        <v-list-item
-          prepend-icon="mdi-map-marker-outline"
-          title="Test Map"
-          value="test_map"
-          router :to="{ name : 'TestMap' }"></v-list-item>
         </v-list>
       </v-navigation-drawer>
 </template>

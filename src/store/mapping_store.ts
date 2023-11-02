@@ -2,6 +2,9 @@ import { defineStore } from 'pinia';
 import MapView from '@arcgis/core/views/MapView';
 import { initialize } from '@/data/map';
 import { landGroup, taxlotLayer, pointGraphic, bufferGraphic } from '@/data/layers';
+import Layer from "@arcgis/core/layers/Layer";
+import Collection from "@arcgis/core/core/Collection";
+
 
 let view: MapView;
 
@@ -45,33 +48,34 @@ export const useMappingStore = defineStore('mapping_store', {
       queryTaxlots.where = `ACCOUNT = ${account_id}`;
       queryTaxlots.outFields = ["*"];
       queryTaxlots.returnQueryGeometry = true;
-      const baseLayers = view.map.basemap.baseLayers as any;
-      queryTaxlots.outSpatialReference = baseLayers.items[0].spatialReference;
-        // Use the 'then' method to call 'displayResults' after the query is complete
-      // Use the 'then' method to call 'displayResults' after the query is complete
+      queryTaxlots.outSpatialReference = view.map.basemap.baseLayers.items[0].spatialReference;
       return createdLayer.queryFeatures(queryTaxlots).then((fset: any) => {
-        this.popupData = fset.features
         this.displayResults(fset);
       });
     },
 
     async displayResults(fset: any) {
       if (fset && fset.features) {
-        const data = fset.features
-        console.log(data.attributes)
-        await view.openPopup({
-          location: pointGraphic.geometry,
-          features: data,
-          featureMenuOpen: true,
-        });
+
+        console.log(fset.features)
 
         fset.features.forEach(function (taxlots: any) {
           bufferGraphic.geometry = taxlots.geometry;
           view.graphics.add(bufferGraphic);
-          view.goTo(bufferGraphic.geometry.extent);
+
           pointGraphic.geometry = taxlots.geometry.centroid;
           view.graphics.add(pointGraphic);
+
         });
+
+        view.goTo(bufferGraphic.geometry.extent).then(() => {
+          view.openPopup({
+            location: pointGraphic.geometry,
+            features: fset.features,
+            featureMenuOpen: false,
+            fetchFeatures: true
+          });
+        })
       } else {
         console.warn('No features found in the query result.');
       }
