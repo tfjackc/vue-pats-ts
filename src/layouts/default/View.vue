@@ -4,5 +4,5 @@
   </v-main>
 </template>
 
-<style src="src/styles/main.css"></style>
+
 

@@ -2,10 +2,6 @@ import { defineStore } from 'pinia';
 import MapView from '@arcgis/core/views/MapView';
 import { initialize } from '@/data/map';
 import { landGroup, taxlotLayer, pointGraphic, bufferGraphic } from '@/data/layers';
-import { useRoute } from 'vue-router'
-import { ref } from "vue";
-// const route = useRoute()
-// const account_id = ref(route.params.account_id)
 
 let view: MapView;
 
@@ -20,59 +16,62 @@ export const useMappingStore = defineStore('mapping_store', {
     async createMap(mapContainer: HTMLDivElement) {
       if (mapContainer) {
         view = await initialize(mapContainer);
-        // Now, you have access to the view object in your store
-
-        // Add layers to the map using the view
-        this.addLayerToMap(landGroup);
-        // You can add other layers as needed
       }
     },
+
     async addLayerToMap(layer: any) {
-      // Add the provided layer to the map's layers
       if (view && layer) {
         view.map.add(layer);
-
-        // Use async/await to load the feature layer and query it
-        try {
-          const featureLayer = await taxlotLayer.createFeatureLayer();
-          await featureLayer.load();
-          const featureSet = await this.queryNewFeatureLayer(featureLayer);
-
-          // Pass the featureSet to displayResults
-          this.displayResults(featureSet);
-        } catch (error) {
-          console.error('Error:', error);
-        }
       }
     },
-    async queryNewFeatureLayer(createdLayer: any) {
+
+    async queryTaxlotsFromAccount(layer: any, account_id: any) {
+      try {
+        const featureLayer = await layer.createFeatureLayer();
+        await featureLayer.load();
+        await this.queryNewFeatureLayer(featureLayer, account_id);
+        //await this.displayResults(featureSet);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    },
+
+    async queryNewFeatureLayer(createdLayer: any, account_id: any) {
       createdLayer.popupTemplate = taxlotLayer.createPopupTemplate();
       const queryTaxlots = createdLayer.createQuery();
-      queryTaxlots.geometry = createdLayer.geometry
-      //queryTaxlots.where = `ACCOUNT = ${account_id.value}`
-      queryTaxlots.where = "ACCOUNT = 1001"
-      queryTaxlots.outFields = ["*"]
-      queryTaxlots.returnQueryGeometry = true
-      queryTaxlots.outSpatialReference = view.map.basemap.baseLayers.items[0].spatialReference
-      return createdLayer.queryFeatures(queryTaxlots);
+      queryTaxlots.geometry = createdLayer.geometry;
+      queryTaxlots.where = `ACCOUNT = ${account_id}`;
+      queryTaxlots.outFields = ["*"];
+      queryTaxlots.returnQueryGeometry = true;
+      const baseLayers = view.map.basemap.baseLayers as any;
+      queryTaxlots.outSpatialReference = baseLayers.items[0].spatialReference;
+        // Use the 'then' method to call 'displayResults' after the query is complete
+      // Use the 'then' method to call 'displayResults' after the query is complete
+      return createdLayer.queryFeatures(queryTaxlots).then((fset: any) => {
+        console.log("Query Result (fset):", fset);
+        console.log("Features in Query Result (fset.features):", fset.features);
+        this.displayResults(fset);
+      });
     },
+
     async displayResults(fset: any) {
-      fset.features.forEach(function(taxlots: any) {
-        bufferGraphic.geometry = taxlots.geometry;
-        view.graphics.add(bufferGraphic);
-        view.goTo(bufferGraphic.geometry.extent)
-        pointGraphic.geometry = taxlots.geometry.centroid;
-        view.graphics.add(pointGraphic);
-
-        console.log(fset.features)
-
-        view.openPopup({
+      if (fset && fset.features && fset.features.length > 0) {
+        await view.openPopup({
           location: pointGraphic.geometry,
           features: fset.features,
-          featureMenuOpen: true
-        })
+          featureMenuOpen: true,
+        });
 
-      })
+        fset.features.forEach(function (taxlots: any) {
+          bufferGraphic.geometry = taxlots.geometry;
+          view.graphics.add(bufferGraphic);
+          view.goTo(bufferGraphic.geometry.extent);
+          pointGraphic.geometry = taxlots.geometry.centroid;
+          view.graphics.add(pointGraphic);
+        });
+      } else {
+        console.warn('No features found in the query result.');
+      }
     },
   },
 });
